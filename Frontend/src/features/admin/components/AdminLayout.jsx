@@ -6,18 +6,27 @@ import {
   Building2Icon,
   UsersIcon,
   HospitalIcon,
+  FlagIcon,
+  LifeBuoyIcon,
+  CreditCardIcon,
 } from "lucide-react";
 import { PATHS } from "@/router/routes";
+import { ROLES } from "@/lib/auth/roles";
+import { useAuth } from "@/features/auth/hooks/useAuth";
 import { cn } from "@/lib/utils";
 import * as adminApi from "@/features/admin/api/adminApi";
 import AdminSidebar from "@/features/admin/components/AdminSidebar";
 import NotificationBell from "@/features/notifications/components/NotificationBell";
 
+// `superOnly` items are hidden from moderators (REPORT_ADMIN).
 const MOBILE_NAV = [
-  { to: PATHS.ADMIN_HOME, label: "Dashboard", icon: LayoutDashboardIcon, end: true },
-  { to: `${PATHS.ADMIN_PHARMACIES}?status=PENDING`, label: "Pharmacies", icon: Building2Icon },
-  { to: PATHS.ADMIN_USERS, label: "Users", icon: UsersIcon },
-  { to: PATHS.ADMIN_HOSPITALS, label: "Hospitals", icon: HospitalIcon },
+  { to: PATHS.ADMIN_HOME, label: "Dashboard", icon: LayoutDashboardIcon, end: true, superOnly: true },
+  { to: `${PATHS.ADMIN_PHARMACIES}?status=PENDING`, label: "Pharmacies", icon: Building2Icon, superOnly: true },
+  { to: PATHS.ADMIN_USERS, label: "Users", icon: UsersIcon, superOnly: true },
+  { to: PATHS.ADMIN_HOSPITALS, label: "Hospitals", icon: HospitalIcon, superOnly: true },
+  { to: PATHS.ADMIN_BILLING, label: "Billing", icon: CreditCardIcon, superOnly: true },
+  { to: PATHS.ADMIN_REPORTS, label: "Reports", icon: FlagIcon },
+  { to: PATHS.ADMIN_SUPPORT, label: "Support", icon: LifeBuoyIcon },
 ];
 
 const EMPTY_STATS = { totalUsers: 0, totalPharmacies: 0, pending: 0, approved: 0 };
@@ -25,13 +34,18 @@ const EMPTY_STATS = { totalUsers: 0, totalPharmacies: 0, pending: 0, approved: 0
 
 export default function AdminLayout() {
   const location = useLocation();
+  const { user } = useAuth();
+  const isSuperAdmin = user?.role === ROLES.ADMIN;
+  const mobileNav = MOBILE_NAV.filter((link) => isSuperAdmin || !link.superOnly);
 
   const [stats, setStats] = useState(EMPTY_STATS);
-  const [statsLoading, setStatsLoading] = useState(true);
+  // Moderators cannot read users or pharmacies, so they have no stats to load.
+  const [statsLoading, setStatsLoading] = useState(isSuperAdmin);
   const [statsKey, setStatsKey] = useState(0);
   const refreshStats = useCallback(() => setStatsKey((k) => k + 1), []);
 
   useEffect(() => {
+    if (!isSuperAdmin) return undefined;
     let active = true;
     async function loadStats() {
       setStatsLoading(true);
@@ -59,7 +73,7 @@ export default function AdminLayout() {
     return () => {
       active = false;
     };
-  }, [statsKey]);
+  }, [statsKey, isSuperAdmin]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-muted/30 via-background to-background">
@@ -81,15 +95,15 @@ export default function AdminLayout() {
             </div>
           </div>
 
-          <nav className="flex items-center gap-1 border-t border-foreground/5 px-3 py-2 lg:hidden">
-            {MOBILE_NAV.map((link) => (
+          <nav className="flex items-center gap-1 overflow-x-auto border-t border-foreground/5 px-3 py-2 lg:hidden">
+            {mobileNav.map((link) => (
               <NavLink
                 key={link.label}
                 to={link.to}
                 end={link.end}
                 className={({ isActive }) =>
                   cn(
-                    "flex flex-1 items-center justify-center gap-1.5 rounded-lg px-2 py-1.5 text-sm font-medium transition-colors",
+                    "flex flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg px-2 py-1.5 text-sm font-medium transition-colors",
                     isActive ? "bg-gradient-to-r from-indigo-600 to-violet-600 text-white" : "text-muted-foreground"
                   )
                 }

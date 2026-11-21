@@ -49,6 +49,12 @@ export async function getFlaggedPharmacies() {
   return Array.isArray(data) ? data : [];
 }
 
+/** Moderation audit trail (super admin only): { logs, page, size, totalElements, totalPages }. */
+export async function getAuditLogs({ page = 0, size = 20 } = {}) {
+  const { data } = await axiosInstance.get("/admin/reports/audit-logs", { params: { page, size } });
+  return data;
+}
+
 export async function resolveReport(id, note) {
   const { data } = await axiosInstance.post(`/admin/reports/${id}/resolve`, note ? { note } : {});
   return data;

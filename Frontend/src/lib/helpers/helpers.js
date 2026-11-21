@@ -45,7 +45,15 @@ export function parseApiError(error, fallback = "Something went wrong. Please tr
     return { message: "That record already exists." };
   }
 
-  // 3) Auth-flavoured statuses.
+  // 3) Subscription paywall (inventory/suppliers/purchases return 402).
+  if (status === 402) {
+    return {
+      message: raw || "Your free trial or subscription has ended. Please subscribe to continue.",
+      subscriptionRequired: true,
+    };
+  }
+
+  // 4) Auth-flavoured statuses.
   if (status === 401) return { message: "Incorrect email or password.", field: "password" };
   if (status === 403) {
     if (text.includes("approve") || text.includes("pending")) return { message: "Your pharmacy is awaiting admin approval." };
@@ -55,7 +63,12 @@ export function parseApiError(error, fallback = "Something went wrong. Please tr
   if (status === 429) return { message: "Too many attempts. Please wait a moment and try again." };
   if (status >= 500) return { message: "Something went wrong on our side. Please try again shortly." };
 
-  // 4) Bean-validation: { errors: { field: msg } } or [{ field, message }].
+  // 5) Bean-validation: { fieldErrors: { field: msg } }, { errors: { field: msg } }
+  //    or [{ field, message }].
+  if (data?.fieldErrors && typeof data.fieldErrors === "object") {
+    const [field, msg] = Object.entries(data.fieldErrors)[0] ?? [];
+    if (msg) return { message: `${field}: ${msg}`, field };
+  }
   if (data?.errors) {
     if (Array.isArray(data.errors) && data.errors[0]) {
       const f = data.errors[0];
@@ -67,7 +80,7 @@ export function parseApiError(error, fallback = "Something went wrong. Please tr
     }
   }
 
-  // 5) Clean backend message (but never dump SQL / stack traces).
+  // 6) Clean backend message (but never dump SQL / stack traces).
   if (raw && raw.length < 160 && !text.includes("exception") && !text.includes("sql")) {
     return { message: raw };
   }
@@ -92,6 +105,35 @@ export function formatDate(iso) {
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return "—";
   return d.toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" });
+}
+
+/** Formats an ISO datetime as "Jun 20, 2026, 3:45 PM", or "—" if absent/invalid. */
+export function formatDateTime(iso) {
+  if (!iso) return "—";
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "—";
+  return d.toLocaleString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+}
+
+/** Formats an amount as "ETB 1,000.00", or "—" if absent. */
+export function formatMoney(amount, currency = "ETB") {
+  if (amount == null || Number.isNaN(Number(amount))) return "—";
+  const value = Number(amount).toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+  return `${currency || "ETB"} ${value}`;
+}
+
+/** Short, human-friendly form of a UUID: "3f2a9c1b". */
+export function shortId(id) {
+  return id ? String(id).slice(0, 8) : "—";
 }
 
 /** Relative time like "2h ago" from an ISO date, or "" if absent/invalid. */

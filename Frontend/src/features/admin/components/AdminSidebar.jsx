@@ -11,9 +11,13 @@ import {
   ActivityIcon,
   HeartPulseIcon,
   LogOutIcon,
+  CreditCardIcon,
+  FlagIcon,
+  LifeBuoyIcon,
 } from "lucide-react";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { PATHS } from "@/router/routes";
+import { ROLES } from "@/lib/auth/roles";
 import { cn } from "@/lib/utils";
 
 const itemBase =
@@ -27,11 +31,9 @@ const PHARMACY_SUBS = [
   { label: "Approved Pharmacies", status: "APPROVED", to: `${PATHS.ADMIN_PHARMACIES}?status=APPROVED` },
 ];
 
-const SOON = [
-  { label: "Reports", icon: BarChart3Icon },
-  { label: "Settings", icon: SettingsIcon },
-  { label: "Activity Logs", icon: ActivityIcon },
-];
+const SOON = [{ label: "Settings", icon: SettingsIcon }];
+
+const navClass = ({ isActive }) => cn(itemBase, isActive ? activeItem : idleItem);
 
 function initials(email) {
   if (!email) return "U";
@@ -58,6 +60,8 @@ function QuickStat({ label, value, loading }) {
 
 export default function AdminSidebar({ stats, loading }) {
   const { user, logout } = useAuth();
+  // Moderators (REPORT_ADMIN) only see the moderation section.
+  const isSuperAdmin = user?.role === ROLES.ADMIN;
   const { pathname } = useLocation();
   const [searchParams] = useSearchParams();
   const statusParam = searchParams.get("status");
@@ -80,6 +84,8 @@ export default function AdminSidebar({ stats, loading }) {
       </div>
 
       <nav className="flex flex-1 flex-col gap-1 overflow-y-auto px-3">
+        {isSuperAdmin && (
+          <>
         <NavLink to={PATHS.ADMIN_HOME} end className={({ isActive }) => cn(itemBase, isActive ? activeItem : idleItem)}>
           <LayoutDashboardIcon className="size-[18px]" />
           Dashboard
@@ -126,8 +132,33 @@ export default function AdminSidebar({ stats, loading }) {
           </div>
         )}
 
-        <SectionLabel>System</SectionLabel>
-        {SOON.map(({ label, icon: Icon }) => (
+        <NavLink to={PATHS.ADMIN_BILLING} className={navClass}>
+          <CreditCardIcon className="size-[18px]" />
+          Billing
+        </NavLink>
+          </>
+        )}
+
+        <SectionLabel>Moderation</SectionLabel>
+        <NavLink to={PATHS.ADMIN_REPORTS} className={navClass}>
+          <FlagIcon className="size-[18px]" />
+          Reports
+        </NavLink>
+        <NavLink to={PATHS.ADMIN_SUPPORT} className={navClass}>
+          <LifeBuoyIcon className="size-[18px]" />
+          Support Tickets
+        </NavLink>
+
+        {isSuperAdmin && (
+          <>
+            <SectionLabel>System</SectionLabel>
+            <NavLink to={PATHS.ADMIN_ACTIVITY} className={navClass}>
+              <ActivityIcon className="size-[18px]" />
+              Activity Log
+            </NavLink>
+          </>
+        )}
+        {isSuperAdmin && SOON.map(({ label, icon: Icon }) => (
           <span key={label} className={cn(itemBase, "cursor-not-allowed text-muted-foreground/50")}>
             <Icon className="size-[18px]" />
             {label}
@@ -139,6 +170,7 @@ export default function AdminSidebar({ stats, loading }) {
       </nav>
 
       {/* Quick Stats */}
+      {isSuperAdmin && (
       <div className="mx-3 mb-2 mt-3 rounded-2xl border border-foreground/5 bg-muted/40 p-4">
         <p className="mb-2 flex items-center gap-1.5 text-xs font-semibold text-foreground">
           <BarChart3Icon className="size-3.5 text-indigo-600" /> Quick Stats
@@ -150,6 +182,7 @@ export default function AdminSidebar({ stats, loading }) {
           <QuickStat label="Approved Pharmacies" value={stats?.approved} loading={loading} />
         </div>
       </div>
+      )}
 
       <div className="mt-auto border-t border-foreground/5 p-3">
         <div className="mb-2 flex items-center gap-3 rounded-lg px-1 py-1.5">
@@ -158,7 +191,7 @@ export default function AdminSidebar({ stats, loading }) {
           </span>
           <div className="min-w-0 leading-tight">
             <p className="truncate text-sm font-semibold text-foreground">{user?.email ?? "Account"}</p>
-            <p className="text-[11px] text-muted-foreground">Administrator</p>
+            <p className="text-[11px] text-muted-foreground">{isSuperAdmin ? "Administrator" : "Moderator"}</p>
           </div>
         </div>
         <button

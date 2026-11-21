@@ -44,7 +44,13 @@ export function useHospitalConnections() {
     return created;
   }, []);
 
-  return { items, loading, error, create, reload };
+  const update = useCallback(async (id, payload) => {
+    const updated = await adminApi.updateHospitalConnection(id, payload);
+    setReloadKey((k) => k + 1);
+    return updated;
+  }, []);
+
+  return { items, loading, error, create, update, reload };
 }
 
 export default useHospitalConnections;

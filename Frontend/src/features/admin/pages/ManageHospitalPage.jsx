@@ -15,9 +15,11 @@ import {
   SearchIcon,
   PlusIcon,
   CopyIcon,
+  PencilIcon,
 } from "lucide-react";
 import { useHospitalConnections } from "@/features/admin/hooks/useHospitalConnections";
 import RegisterHospitalDialog from "@/features/admin/components/RegisterHospitalDialog";
+import EditHospitalDialog from "@/features/admin/components/EditHospitalDialog";
 import { cn } from "@/lib/utils";
 
 function StatCard({ icon: Icon, label, value, hint, tone }) {
@@ -43,9 +45,10 @@ async function copy(text) {
 }
 
 export default function ManageHospitalPage() {
-  const { items, loading, error, create } = useHospitalConnections();
+  const { items, loading, error, create, update } = useHospitalConnections();
   const [search, setSearch] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [editing, setEditing] = useState(null);
 
   const active = items.filter((h) => h.active).length;
   const inactive = items.length - active;
@@ -81,7 +84,7 @@ export default function ManageHospitalPage() {
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-foreground/5 p-5">
           <div>
             <h2 className="font-heading text-base font-semibold">Connected Hospitals</h2>
-            <p className="text-sm text-muted-foreground">Each hospital gets a unique generated ID.</p>
+            <p className="text-sm text-muted-foreground">Each hospital has a unique ID, generated or entered by you.</p>
           </div>
           <div className="flex flex-1 flex-wrap items-center justify-end gap-2">
             <div className="relative min-w-48 flex-1 sm:max-w-xs">
@@ -114,17 +117,18 @@ export default function ManageHospitalPage() {
               <TableHead>Hospital ID</TableHead>
               <TableHead>Base URL</TableHead>
               <TableHead>Status</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {loading && (
               <TableRow>
-                <TableCell colSpan={5} className="py-12 text-center text-muted-foreground">Loading hospitals…</TableCell>
+                <TableCell colSpan={6} className="py-12 text-center text-muted-foreground">Loading hospitals…</TableCell>
               </TableRow>
             )}
             {!loading && filtered.length === 0 && !error && (
               <TableRow>
-                <TableCell colSpan={5} className="py-12 text-center text-muted-foreground">
+                <TableCell colSpan={6} className="py-12 text-center text-muted-foreground">
                   {items.length === 0
                     ? "No hospitals connected yet. Register one to get started."
                     : "No hospitals match your search."}
@@ -160,6 +164,14 @@ export default function ManageHospitalPage() {
                       {h.active ? "Active" : "Inactive"}
                     </span>
                   </TableCell>
+                  <TableCell className="text-right">
+                    <button
+                      onClick={() => setEditing(h)}
+                      className="inline-flex items-center gap-1 rounded-lg border border-foreground/10 bg-background px-2.5 py-1.5 text-xs font-medium transition-colors hover:border-indigo-500/40 hover:text-indigo-700"
+                    >
+                      <PencilIcon className="size-3.5" /> Edit
+                    </button>
+                  </TableCell>
                 </TableRow>
               ))}
           </TableBody>
@@ -171,6 +183,15 @@ export default function ManageHospitalPage() {
         onClose={() => setDialogOpen(false)}
         onCreate={create}
       />
+
+      {editing && (
+        <EditHospitalDialog
+          key={editing.id}
+          hospital={editing}
+          onClose={() => setEditing(null)}
+          onUpdate={update}
+        />
+      )}
     </div>
   );
 }

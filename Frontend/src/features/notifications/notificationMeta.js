@@ -10,6 +10,13 @@ import {
   SparklesIcon,
   Building2Icon,
   BellIcon,
+  FlagIcon,
+  MessageSquareIcon,
+  BanIcon,
+  CrownIcon,
+  CreditCardIcon,
+  CalendarClockIcon,
+  ShoppingCartIcon,
 } from "lucide-react";
 
 /** Maps a NotificationType to an icon + colour tone for the bell dropdown. */
@@ -28,6 +35,24 @@ const META = {
   MEDICINE_BACK_IN_STOCK: { icon: PackageCheckIcon, tone: "bg-emerald-500/10 text-emerald-600" },
   // System admin
   NEW_PHARMACY_PENDING: { icon: Building2Icon, tone: "bg-indigo-500/10 text-indigo-600" },
+  NEW_REPORT_FLAGGED: { icon: AlertTriangleIcon, tone: "bg-rose-500/10 text-rose-600" },
+  // Inventory / sales
+  MEDICINE_EXPIRING: { icon: CalendarClockIcon, tone: "bg-amber-500/10 text-amber-600" },
+  PURCHASE_RECEIVED: { icon: PackageCheckIcon, tone: "bg-emerald-500/10 text-emerald-600" },
+  SALE_COMPLETED: { icon: ShoppingCartIcon, tone: "bg-emerald-500/10 text-emerald-600" },
+  // Reports / moderation
+  COMPLAINT_RECEIVED: { icon: FlagIcon, tone: "bg-rose-500/10 text-rose-600" },
+  NEW_REPORT_SUBMITTED: { icon: FlagIcon, tone: "bg-amber-500/10 text-amber-600" },
+  PHARMACY_RESPONDED: { icon: MessageSquareIcon, tone: "bg-indigo-500/10 text-indigo-600" },
+  PHARMACY_WARNED: { icon: AlertTriangleIcon, tone: "bg-amber-500/10 text-amber-600" },
+  PHARMACY_SUSPENDED: { icon: BanIcon, tone: "bg-rose-500/10 text-rose-600" },
+  COMPLAINT_RESOLVED: { icon: CheckCircle2Icon, tone: "bg-emerald-500/10 text-emerald-600" },
+  // Subscription / billing
+  TRIAL_STARTED: { icon: SparklesIcon, tone: "bg-indigo-500/10 text-indigo-600" },
+  SUBSCRIPTION_ACTIVATED: { icon: CrownIcon, tone: "bg-emerald-500/10 text-emerald-600" },
+  SUBSCRIPTION_EXPIRING_SOON: { icon: ClockIcon, tone: "bg-amber-500/10 text-amber-600" },
+  SUBSCRIPTION_EXPIRED: { icon: CreditCardIcon, tone: "bg-rose-500/10 text-rose-600" },
+  PAYMENT_FAILED: { icon: XCircleIcon, tone: "bg-rose-500/10 text-rose-600" },
   // Fallback
   GENERAL: { icon: BellIcon, tone: "bg-muted text-muted-foreground" },
 };

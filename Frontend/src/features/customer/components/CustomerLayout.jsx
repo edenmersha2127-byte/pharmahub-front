@@ -1,5 +1,5 @@
 import { NavLink, Outlet, useLocation } from "react-router-dom";
-import { HeartPulseIcon, HomeIcon, SearchIcon, FileTextIcon } from "lucide-react";
+import { HeartPulseIcon, HomeIcon, SearchIcon, FileTextIcon, FlagIcon, LifeBuoyIcon } from "lucide-react";
 import { PATHS } from "@/router/routes";
 import { cn } from "@/lib/utils";
 import CustomerSidebar from "@/features/customer/components/CustomerSidebar";
@@ -9,6 +9,8 @@ const MOBILE_NAV = [
   { to: PATHS.CUSTOMER_HOME, label: "Home", icon: HomeIcon, end: true },
   { to: PATHS.CUSTOMER_SEARCH, label: "Search", icon: SearchIcon },
   { to: PATHS.CUSTOMER_PRESCRIPTIONS, label: "Upload", icon: FileTextIcon },
+  { to: PATHS.CUSTOMER_REPORTS, label: "Reports", icon: FlagIcon },
+  { to: PATHS.CUSTOMER_SUPPORT, label: "Help", icon: LifeBuoyIcon },
 ];
 
 /** Customer shell: fixed sidebar + sticky top bar + routed content. */
@@ -38,7 +40,7 @@ export default function CustomerLayout() {
           </div>
 
           {/* Mobile nav */}
-          <nav className="flex items-center gap-1 border-t border-foreground/5 px-3 py-2 lg:hidden">
+          <nav className="flex items-center gap-1 overflow-x-auto border-t border-foreground/5 px-3 py-2 lg:hidden">
             {MOBILE_NAV.map((link) => (
               <NavLink
                 key={link.to}
@@ -46,7 +48,7 @@ export default function CustomerLayout() {
                 end={link.end}
                 className={({ isActive }) =>
                   cn(
-                    "flex flex-1 items-center justify-center gap-1.5 rounded-lg px-2 py-1.5 text-sm font-medium transition-colors",
+                    "flex flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg px-2 py-1.5 text-sm font-medium transition-colors",
                     isActive
                       ? "bg-gradient-to-r from-indigo-600 to-violet-600 text-white"
                       : "text-muted-foreground"

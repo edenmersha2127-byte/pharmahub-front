@@ -24,6 +24,17 @@ export function PublicOnlyRoute() {
 }
 
 /**
+ * Restricts a single page inside an already-authenticated area to some roles
+ * (e.g. super-admin-only pages inside the admin shell that moderators can also
+ * enter). Others are sent to their own home.
+ */
+export function RequireRole({ roles, children }) {
+  const { user } = useAuth();
+  if (!roles.includes(user?.role)) return <Navigate to={roleHome(user?.role)} replace />;
+  return children;
+}
+
+/**
  * Temporary authenticated landing. The Customer / Pharmacy / Admin feature
  * modules will replace these placeholders; for now they prove the end-to-end
  * auth + role-guard + logout flow works.

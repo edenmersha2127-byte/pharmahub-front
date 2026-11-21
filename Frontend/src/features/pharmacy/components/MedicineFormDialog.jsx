@@ -10,7 +10,9 @@ import {
 import { Button } from "@/components/ui/button";
 import FormField from "@/features/auth/components/FormField";
 import { MEDICINE_CATEGORIES } from "@/features/pharmacy/constants";
-import { extractApiError } from "@/lib/helpers/helpers";
+import { Link } from "react-router-dom";
+import { parseApiError } from "@/lib/helpers/helpers";
+import { PATHS } from "@/router/routes";
 
 function toForm(m) {
   return {
@@ -41,6 +43,8 @@ export default function MedicineFormDialog({ initialValue, onSubmit, onClose }) 
   const [form, setForm] = useState(() => toForm(initialValue));
   const [errors, setErrors] = useState({});
   const [serverError, setServerError] = useState("");
+  // True when the save was refused because the subscription/trial has ended.
+  const [needsSubscription, setNeedsSubscription] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   const set = (field) => (e) => {
@@ -91,7 +95,9 @@ export default function MedicineFormDialog({ initialValue, onSubmit, onClose }) 
       await onSubmit(payload);
       onClose(); // success: parent unmounts the dialog
     } catch (err) {
-      setServerError(extractApiError(err, "Could not save the medicine. Please try again."));
+      const parsed = parseApiError(err, "Could not save the medicine. Please try again.");
+      setServerError(parsed.message);
+      setNeedsSubscription(Boolean(parsed.subscriptionRequired));
       setSubmitting(false);
     }
   };
@@ -207,6 +213,11 @@ export default function MedicineFormDialog({ initialValue, onSubmit, onClose }) 
           {serverError && (
             <p className="rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive">
               {serverError}
+              {needsSubscription && (
+                <Link to={PATHS.PHARMACY_SUBSCRIPTION} className="ml-1 font-semibold underline underline-offset-2">
+                  View plans
+                </Link>
+              )}
             </p>
           )}
         </form>

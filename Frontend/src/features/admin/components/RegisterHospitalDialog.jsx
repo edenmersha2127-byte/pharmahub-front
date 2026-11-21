@@ -12,13 +12,14 @@ import {
   MailIcon,
   LinkIcon,
   KeyRoundIcon,
+  HashIcon,
   CopyIcon,
   CheckCircle2Icon,
   Loader2Icon,
 } from "lucide-react";
 import { extractApiError } from "@/lib/helpers/helpers";
 
-const EMPTY = { name: "", email: "", baseUrl: "", apiKey: "" };
+const EMPTY = { name: "", email: "", baseUrl: "", apiKey: "", hospitalId: "" };
 
 function Field({ icon: Icon, label, hint, children }) {
   return (
@@ -68,6 +69,7 @@ export default function RegisterHospitalDialog({ open, onClose, onCreate }) {
         email: form.email.trim(),
         baseUrl: form.baseUrl.trim(),
         apiKey: form.apiKey.trim(),
+        hospitalId: form.hospitalId.trim(),
       });
       setCreated(result);
       toast.success(`${result.name} onboarded — ID ${result.hospitalId}`);
@@ -89,7 +91,7 @@ export default function RegisterHospitalDialog({ open, onClose, onCreate }) {
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-md">
         {created ? (
           <>
             <DialogHeader>
@@ -105,7 +107,7 @@ export default function RegisterHospitalDialog({ open, onClose, onCreate }) {
 
             <div className="rounded-2xl border border-indigo-500/20 bg-gradient-to-br from-indigo-500/5 to-violet-500/5 p-5 text-center">
               <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                Generated Hospital ID
+                Hospital ID
               </p>
               <p className="mt-2 font-heading text-3xl font-bold tracking-tight text-indigo-700">
                 {created.hospitalId}
@@ -191,6 +193,20 @@ export default function RegisterHospitalDialog({ open, onClose, onCreate }) {
                 />
               </Field>
 
+              <Field
+                icon={HashIcon}
+                label="Hospital ID"
+                hint="Optional — leave empty to generate one. Enter it if the hospital already has an ID."
+              >
+                <input
+                  value={form.hospitalId}
+                  onChange={set("hospitalId")}
+                  maxLength={100}
+                  placeholder="Generated automatically"
+                  className={`${inputClass} font-mono`}
+                />
+              </Field>
+
               {error && (
                 <p className="rounded-lg bg-destructive/10 px-3 py-2 text-sm text-destructive">{error}</p>
               )}
@@ -205,7 +221,7 @@ export default function RegisterHospitalDialog({ open, onClose, onCreate }) {
                     <Loader2Icon className="size-4 animate-spin" /> Registering…
                   </>
                 ) : (
-                  "Register & generate ID"
+                  form.hospitalId.trim() ? "Register hospital" : "Register & generate ID"
                 )}
               </button>
             </form>

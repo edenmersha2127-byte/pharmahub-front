@@ -9,7 +9,9 @@ import { extractApiError } from "@/lib/helpers/helpers";
  *
  * The backend only exposes a PATCH to set the status (no GET for the current
  * value yet), so we remember the last-known state per pharmacy in localStorage
- * and default to "open". Every toggle reconciles with the value the API returns.
+ * and default to "closed" — the backend creates every pharmacy with
+ * is_open = false, so assuming "open" made the first click send open=false and
+ * change nothing. Every toggle reconciles with the value the API returns.
  */
 const storageKey = (id) => `pharmacy-open:${id ?? "me"}`;
 
@@ -19,7 +21,7 @@ export function useOpenStatus() {
 
   const [open, setOpen] = useState(() => {
     const saved = localStorage.getItem(key);
-    return saved === null ? true : saved === "true";
+    return saved === "true";
   });
   const [saving, setSaving] = useState(false);
 

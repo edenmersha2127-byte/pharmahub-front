@@ -8,6 +8,8 @@ import {
   SettingsIcon,
   HeartPulseIcon,
   LogOutIcon,
+  FlagIcon,
+  LifeBuoyIcon,
 } from "lucide-react";
 import { useAuth } from "@/features/auth/hooks/useAuth";
 import { useDisplayName } from "@/features/auth/hooks/useDisplayName";
@@ -20,6 +22,8 @@ const NAV = [
   { to: PATHS.CUSTOMER_SEARCH, label: "Search Medicine", icon: SearchIcon },
   { to: PATHS.CUSTOMER_PRESCRIPTIONS, label: "Upload Prescription", icon: FileTextIcon },
   { to: PATHS.CUSTOMER_PROFILE, label: "My Profile", icon: UserIcon, badge: "New" },
+  { to: PATHS.CUSTOMER_REPORTS, label: "My Reports", icon: FlagIcon },
+  { to: PATHS.CUSTOMER_SUPPORT, label: "Help & Support", icon: LifeBuoyIcon },
 ];
 
 const SOON = [

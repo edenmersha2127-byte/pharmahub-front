@@ -7,6 +7,16 @@ import {
   PlusIcon,
   MapPinIcon,
   ChevronDownIcon,
+  FlagIcon,
+  CreditCardIcon,
+  LifeBuoyIcon,
+  ShoppingCartIcon,
+  ReceiptIcon,
+  ClipboardListIcon,
+  TruckIcon,
+  BarChart3Icon,
+  UsersIcon,
+  UserCogIcon,
 } from "lucide-react";
 import { PATHS } from "@/router/routes";
 import { cn } from "@/lib/utils";
@@ -18,6 +28,16 @@ const MOBILE_NAV = [
   { to: PATHS.PHARMACY_HOME, label: "Dashboard", icon: LayoutDashboardIcon, end: true },
   { to: PATHS.PHARMACY_INVENTORY, label: "Medicines", icon: BoxesIcon },
   { to: `${PATHS.PHARMACY_INVENTORY}?add=1`, label: "Add", icon: PlusIcon },
+  { to: PATHS.PHARMACY_POS, label: "Sell", icon: ShoppingCartIcon },
+  { to: PATHS.PHARMACY_SALES, label: "Sales", icon: ReceiptIcon },
+  { to: PATHS.PHARMACY_PURCHASES, label: "Orders", icon: ClipboardListIcon },
+  { to: PATHS.PHARMACY_SUPPLIERS, label: "Suppliers", icon: TruckIcon },
+  { to: PATHS.PHARMACY_INSIGHTS, label: "Insights", icon: BarChart3Icon },
+  { to: PATHS.PHARMACY_CUSTOMERS, label: "Customers", icon: UsersIcon },
+  { to: PATHS.PHARMACY_STAFF, label: "Staff", icon: UserCogIcon },
+  { to: PATHS.PHARMACY_REPORTS, label: "Reports", icon: FlagIcon },
+  { to: PATHS.PHARMACY_SUBSCRIPTION, label: "Plan", icon: CreditCardIcon },
+  { to: PATHS.PHARMACY_SUPPORT, label: "Help", icon: LifeBuoyIcon },
 ];
 
 /** Pharmacy shell: fixed sidebar + sticky top bar + routed content. */
@@ -51,7 +71,7 @@ export default function PharmacyLayout() {
             </div>
           </div>
 
-          <nav className="flex items-center gap-1 border-t border-foreground/5 px-3 py-2 lg:hidden">
+          <nav className="flex items-center gap-1 overflow-x-auto border-t border-foreground/5 px-3 py-2 lg:hidden">
             {MOBILE_NAV.map((link) => (
               <NavLink
                 key={link.label}
@@ -59,7 +79,7 @@ export default function PharmacyLayout() {
                 end={link.end}
                 className={({ isActive }) =>
                   cn(
-                    "flex flex-1 items-center justify-center gap-1.5 rounded-lg px-2 py-1.5 text-sm font-medium transition-colors",
+                    "flex flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg px-2 py-1.5 text-sm font-medium transition-colors",
                     isActive ? "bg-gradient-to-r from-indigo-600 to-violet-600 text-white" : "text-muted-foreground"
                   )
                 }

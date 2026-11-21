@@ -1,4 +1,4 @@
-import { MapPinIcon, NavigationIcon } from "lucide-react";
+import { MapPinIcon, NavigationIcon, FlagIcon } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { formatDistance, googleMapsDirectionsUrl } from "@/lib/helpers/helpers";
@@ -10,7 +10,7 @@ function stockTone(item) {
 }
 
 
-export default function MedicineResultCard({ item, userCoords, active, onSelect }) {
+export default function MedicineResultCard({ item, userCoords, active, onSelect, onReport }) {
   const price = item.price != null ? `ETB ${Number(item.price).toFixed(2)}` : "—";
   const stock = stockTone(item);
 
@@ -86,6 +86,25 @@ export default function MedicineResultCard({ item, userCoords, active, onSelect 
         ) : (
           <span />
         )}
+        <div className="flex items-center gap-1.5">
+        {onReport && (
+          <button
+            type="button"
+            title="Report an issue with this pharmacy"
+            onClick={(e) => {
+              e.stopPropagation();
+              onReport(item);
+            }}
+            onKeyDown={(e) => e.stopPropagation()}
+            className={cn(
+              buttonVariants({ variant: "ghost", size: "sm" }),
+              "gap-1.5 text-muted-foreground hover:bg-rose-50 hover:text-rose-600"
+            )}
+          >
+            <FlagIcon className="size-3.5" />
+            Report
+          </button>
+        )}
         <a
           href={googleMapsDirectionsUrl(item.latitude, item.longitude, userCoords?.lat, userCoords?.lng)}
           target="_blank"
@@ -99,6 +118,7 @@ export default function MedicineResultCard({ item, userCoords, active, onSelect 
           <NavigationIcon className="size-3.5" />
           Navigate
         </a>
+        </div>
       </div>
     </div>
   );

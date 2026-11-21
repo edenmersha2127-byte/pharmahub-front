@@ -31,6 +31,17 @@ export async function getUsers({ page = 0, size = 20 } = {}) {
 }
 
 
+/**
+ * Create a REPORT_ADMIN sub-admin who can moderate reports and support tickets
+ * but nothing else. Super admin only.
+ * @returns { id, email, firstName, lastName, role }
+ */
+export async function createReportAdmin({ email, password, firstName, lastName }) {
+  const { data } = await axiosInstance.post("/admin/report-admins", { email, password, firstName, lastName });
+  return data;
+}
+
+
 // --- Hospital connections (integrated hospitals / verification directory) ----
 
 /**
@@ -46,10 +57,24 @@ export async function getHospitalConnections() {
  * Onboard a new hospital. The backend generates the unique `hospitalId`
  * (format HSP-XXXXX) — it is returned on the created connection.
  */
-export async function createHospitalConnection({ name, email, baseUrl, apiKey } = {}) {
+export async function createHospitalConnection({ name, email, baseUrl, apiKey, hospitalId } = {}) {
   const payload = { name, email, baseUrl };
   if (apiKey) payload.apiKey = apiKey;
+  // Optional: the admin may enter the ID instead of having one generated.
+  if (hospitalId) payload.hospitalId = hospitalId;
   const { data } = await axiosInstance.post("/hospital-connections", payload);
+  return data;
+}
+
+/**
+ * Edit a hospital connection, including its `hospitalId`. Leave `apiKey` empty
+ * to keep the stored key (the backend never returns it).
+ * @param id the connection's UUID (`id`), not the HSP-… hospitalId
+ */
+export async function updateHospitalConnection(id, { name, email, hospitalId, baseUrl, apiKey, active } = {}) {
+  const payload = { name, email, hospitalId, baseUrl, active };
+  if (apiKey) payload.apiKey = apiKey;
+  const { data } = await axiosInstance.put(`/hospital-connections/${id}`, payload);
   return data;
 }
 

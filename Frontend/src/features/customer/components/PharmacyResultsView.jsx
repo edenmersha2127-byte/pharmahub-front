@@ -1,10 +1,12 @@
 import { useMemo, useState } from "react";
 import MedicineResultCard from "@/features/customer/components/MedicineResultCard";
 import PharmacyMap from "@/features/customer/components/PharmacyMap";
+import ReportPharmacyDialog from "@/features/reports/components/ReportPharmacyDialog";
 
 
 export default function PharmacyResultsView({ results, userCoords, header, footer }) {
   const [selectedId, setSelectedId] = useState(null);
+  const [reporting, setReporting] = useState(null);
 
   
   const pharmacies = useMemo(() => {
@@ -32,6 +34,7 @@ export default function PharmacyResultsView({ results, userCoords, header, foote
               userCoords={userCoords}
               active={item.pharmacyId === selectedId}
               onSelect={() => setSelectedId(item.pharmacyId)}
+              onReport={setReporting}
             />
           ))}
         </div>
@@ -41,6 +44,8 @@ export default function PharmacyResultsView({ results, userCoords, header, foote
       <div className="order-1 h-72 overflow-hidden rounded-2xl border border-foreground/5 shadow-sm lg:order-2 lg:sticky lg:top-24 lg:h-[calc(100vh-8rem)]">
         <PharmacyMap userCoords={userCoords} pharmacies={pharmacies} selected={selected} />
       </div>
+
+      <ReportPharmacyDialog pharmacy={reporting} open={Boolean(reporting)} onClose={() => setReporting(null)} />
     </div>
   );
 }
