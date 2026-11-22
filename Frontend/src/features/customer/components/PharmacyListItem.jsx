@@ -1,10 +1,10 @@
-import { PlusIcon, MapPinIcon, NavigationIcon } from "lucide-react";
+import { PlusIcon, MapPinIcon, NavigationIcon, FlagIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { formatDistance, googleMapsDirectionsUrl } from "@/lib/helpers/helpers";
 import { medicineStockStatus } from "@/features/customer/stock";
 
 
-export default function PharmacyListItem({ item, active, nearest, userCoords, onSelect }) {
+export default function PharmacyListItem({ item, active, nearest, userCoords, onSelect, onReport }) {
   const status = medicineStockStatus(item);
   const price = item.price != null ? `ETB ${Number(item.price).toFixed(2)}` : "—";
   const showDistance = userCoords && item.distanceMeters != null;
@@ -74,6 +74,21 @@ export default function PharmacyListItem({ item, active, nearest, userCoords, on
           <NavigationIcon className="size-3" />
           Directions
         </a>
+        {onReport && (
+          <button
+            type="button"
+            title="Report a problem with this pharmacy"
+            onClick={(e) => {
+              e.stopPropagation();
+              onReport(item);
+            }}
+            onKeyDown={(e) => e.stopPropagation()}
+            className="mt-1 flex w-full items-center justify-end gap-1 text-xs font-medium text-muted-foreground transition-colors hover:text-rose-600"
+          >
+            <FlagIcon className="size-3" />
+            Report
+          </button>
+        )}
       </div>
     </div>
   );

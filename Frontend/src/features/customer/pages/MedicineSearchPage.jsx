@@ -17,6 +17,7 @@ import { useMedicines } from "@/features/customer/hooks/useMedicines";
 import { useGeolocation } from "@/features/customer/hooks/useGeolocation";
 import { medicineStockStatus } from "@/features/customer/stock";
 import PharmacyListItem from "@/features/customer/components/PharmacyListItem";
+import ReportPharmacyDialog from "@/features/reports/components/ReportPharmacyDialog";
 import PharmacyMap from "@/features/customer/components/PharmacyMap";
 import ResultCardSkeleton from "@/features/customer/components/ResultCardSkeleton";
 import EmptyState from "@/features/customer/components/EmptyState";
@@ -40,6 +41,8 @@ export default function MedicineSearchPage() {
   const [queryError, setQueryError] = useState("");
   const [stockFilter, setStockFilter] = useState("all");
   const [selectedId, setSelectedId] = useState(null);
+  // The search result the customer is filing a report about, if any.
+  const [reporting, setReporting] = useState(null);
 
   const geo = useGeolocation();
   const { results, meta, loading, error, hasSearched, search, loadMore } = useMedicines();
@@ -257,6 +260,7 @@ export default function MedicineSearchPage() {
                   active={item.pharmacyId === (selected?.pharmacyId ?? null)}
                   nearest={i === 0 && !!geo.coords && item.distanceMeters != null}
                   onSelect={() => setSelectedId(item.pharmacyId)}
+                  onReport={setReporting}
                 />
               ))}
               {!meta.last && (
@@ -328,6 +332,8 @@ export default function MedicineSearchPage() {
           </div>
         </>
       )}
+
+      <ReportPharmacyDialog pharmacy={reporting} open={Boolean(reporting)} onClose={() => setReporting(null)} />
     </div>
   );
 }

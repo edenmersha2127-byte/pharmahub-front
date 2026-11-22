@@ -42,6 +42,11 @@ export function parseApiError(error, fallback = "Something went wrong. Please tr
   ) {
     if (text.includes("license")) return { message: "This license number is already registered.", field: "licenseNumber" };
     if (text.includes("email")) return { message: "This email is already registered.", field: "email" };
+    // A 409 with a clean, human-written reason (e.g. "You have already reported
+    // this pharmacy recently…") is more useful than the generic line.
+    if (status === 409 && raw && raw.length < 200 && !/duplicate|constraint|exception|sql/.test(text)) {
+      return { message: raw };
+    }
     return { message: "That record already exists." };
   }
 
